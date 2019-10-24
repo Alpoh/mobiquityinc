@@ -1,4 +1,4 @@
-package com.mobiquityinc.MobEuHiringJava;
+package com.mobiquityinc;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

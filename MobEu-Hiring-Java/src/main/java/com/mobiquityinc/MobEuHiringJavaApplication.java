@@ -1,4 +1,4 @@
-package com.mobiquityinc.MobEuHiringJava;
+package com.mobiquityinc;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
