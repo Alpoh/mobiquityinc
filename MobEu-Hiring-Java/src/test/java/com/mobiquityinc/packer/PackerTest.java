@@ -1,5 +1,6 @@
 package com.mobiquityinc.packer;
 
+import com.mobiquityinc.entity.Package;
 import com.mobiquityinc.exception.APIException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,6 +29,12 @@ public class PackerTest {
 	}
 
 	@Test
+	public void mapPackages(){}
+
+	@Test
+	public void mapItems(){}
+
+	@Test
 	public void processFile() {
 		Stream<String> lines = Packer.getLines();
 		if (Objects.nonNull(lines)) {
@@ -35,6 +42,11 @@ public class PackerTest {
 		} else {
 			System.out.println("::empty or null:: ");
 		}
+	}
+
+	@Test
+	public void validatePackage(){
+
 	}
 
 	@Test(expected = NullPointerException.class)
