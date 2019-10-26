@@ -1,6 +1,5 @@
 package com.mobiquityinc.packer;
 
-import com.mobiquityinc.entity.Package;
 import com.mobiquityinc.exception.APIException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,10 +28,12 @@ public class PackerTest {
 	}
 
 	@Test
-	public void mapPackages(){}
+	public void mapPackages() {
+	}
 
 	@Test
-	public void mapItems(){}
+	public void mapItems() {
+	}
 
 	@Test
 	public void processFile() {
@@ -45,7 +46,15 @@ public class PackerTest {
 	}
 
 	@Test
-	public void validatePackage(){
+	public void bestValueOneLine() throws APIException {
+		String expectedOutput = "4";
+		String data = "81 : (1,53.38,€45) (2,88.62,€98) (3,78.48,€3) (4,72.30,€76) (5,30.18,€9) (6,46.34,€48)";
+		String output = Packer.pack("fileTest.txt");
+		Assert.assertEquals(expectedOutput,output);
+	}
+
+	@Test
+	public void validatePackage() {
 
 	}
 
