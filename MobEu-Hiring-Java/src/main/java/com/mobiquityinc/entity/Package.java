@@ -6,15 +6,15 @@ import java.util.List;
 public class Package {
 	private static Integer MAX_ITEMS = 15;
 	private static Integer MAX_WEIGHT = 100;
-	private List<Item> content;
-	private BigDecimal maxWeight;
+	private List<Item> items;
+	private BigDecimal capacity;
 
 	public Package() {
 	}
 
-	public Package(List<Item> content, BigDecimal maxWeight) {
-		this.content = content;
-		this.maxWeight = maxWeight;
+	public Package(List<Item> content, BigDecimal capacity) {
+		this.items = content;
+		this.capacity = capacity;
 	}
 
 	@Override
@@ -24,39 +24,39 @@ public class Package {
 
 		Package aPackage = (Package) o;
 
-		if (getContent() != null ? !getContent().equals(aPackage.getContent()) : aPackage.getContent() != null)
+		if (getItems() != null ? !getItems().equals(aPackage.getItems()) : aPackage.getItems() != null)
 			return false;
-		return getMaxWeight() != null ? getMaxWeight().equals(aPackage.getMaxWeight()) : aPackage.getMaxWeight() == null;
+		return getCapacity() != null ? getCapacity().equals(aPackage.getCapacity()) : aPackage.getCapacity() == null;
 	}
 
 	@Override
 	public int hashCode() {
-		int result = getContent() != null ? getContent().hashCode() : 0;
-		result = 31 * result + (getMaxWeight() != null ? getMaxWeight().hashCode() : 0);
+		int result = getItems() != null ? getItems().hashCode() : 0;
+		result = 31 * result + (getCapacity() != null ? getCapacity().hashCode() : 0);
 		return result;
 	}
 
 	@Override
 	public String toString() {
 		return "Package{" +
-				"content=" + content +
-				", maxWeight=" + maxWeight +
+				"content=" + items +
+				", capacity=" + capacity +
 				'}';
 	}
 
-	public List<Item> getContent() {
-		return content;
+	public List<Item> getItems() {
+		return items;
 	}
 
-	public void setContent(List<Item> content) {
-		this.content = content;
+	public void setItems(List<Item> items) {
+		this.items = items;
 	}
 
-	public BigDecimal getMaxWeight() {
-		return maxWeight;
+	public BigDecimal getCapacity() {
+		return capacity;
 	}
 
-	public void setMaxWeight(BigDecimal maxWeight) {
-		this.maxWeight = maxWeight;
+	public void setCapacity(BigDecimal capacity) {
+		this.capacity = capacity;
 	}
 }
