@@ -62,8 +62,8 @@ public class PackerTest {
 
 	}
 
-	@Test(expected = NullPointerException.class)
-	public void wrongFile() throws NullPointerException, APIException {
+	@Test(expected = APIException.class)
+	public void wrongFile() throws APIException {
 		data = Packer.pack("fileWrongTest.txt");
 		Assert.assertNotNull(data);
 	}
