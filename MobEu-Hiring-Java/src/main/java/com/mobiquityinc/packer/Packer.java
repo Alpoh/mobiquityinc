@@ -28,7 +28,7 @@ public class Packer {
 		try {
 			FileInputStream fis = new FileInputStream(filePath);
 			String data = IOUtils.toString(fis, "UTF-8");
-			lines = Arrays.asList(data.trim().split("\n"));
+			lines = Arrays.asList(data.trim().split(System.lineSeparator()));
 			for (String line : lines) {
 				packages.add(mapLineToPackage(line));
 			}
