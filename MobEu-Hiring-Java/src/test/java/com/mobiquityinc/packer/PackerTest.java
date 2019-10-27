@@ -2,16 +2,11 @@ package com.mobiquityinc.packer;
 
 import com.mobiquityinc.exception.APIException;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.internal.runners.JUnit4ClassRunner;
-import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Objects;
-import java.util.stream.Stream;
-
 @SpringBootTest
-@RunWith(JUnit4ClassRunner.class)
 public class PackerTest {
 
 	private String data;
@@ -35,22 +30,33 @@ public class PackerTest {
 	public void mapItems() {
 	}
 
-	@Test
+
+	@Ignore
 	public void processFile() {
-		Stream<String> lines = Packer.getLines();
-		if (Objects.nonNull(lines)) {
-			lines.forEach(l -> System.out.println("::line:: " + l));
-		} else {
-			System.out.println("::empty or null:: ");
-		}
+//		Stream<String> lines = Packer.getLines();
+//		if (Objects.nonNull(lines)) {
+//			lines.forEach(l -> System.out.println("::line:: " + l));
+//		} else {
+//			System.out.println("::empty or null:: ");
+//		}
 	}
 
 	@Test
 	public void bestValueOneLine() throws APIException {
 		String expectedOutput = "4";
 		String data = "81 : (1,53.38,€45) (2,88.62,€98) (3,78.48,€3) (4,72.30,€76) (5,30.18,€9) (6,46.34,€48)";
+		String output = Packer.pack("fileOneLineTest.txt");
+		System.out.println("::output:: " + output);
+		Assert.assertEquals(expectedOutput, output);
+
+	}
+
+	@Test
+	public void bestValueFile() throws APIException {
+		String expectedOutput = "4-2,78,9";
 		String output = Packer.pack("fileTest.txt");
-		Assert.assertEquals(expectedOutput,output);
+		System.out.println("::output:: " + output);
+		Assert.assertEquals(expectedOutput, output);
 	}
 
 	@Test

@@ -1,6 +1,7 @@
 package com.mobiquityinc.packer;
 
 import com.mobiquityinc.entity.Item;
+import com.mobiquityinc.entity.Output;
 import com.mobiquityinc.entity.Package;
 import com.mobiquityinc.exception.APIException;
 
@@ -13,7 +14,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 public class Packer {
 
@@ -24,77 +25,94 @@ public class Packer {
 		Path path;
 		List<Package> packages = new ArrayList<>();
 		String response = "";
-		Stream<String> lines = null;
+		List<String> lines = null;
 		try {
 			path = Paths.get(Packer.class.getClassLoader().getResource(filePath).toURI());
-			lines = Files.lines(path);
-			lines.forEach(line -> packages.addAll(mapLineToPackage(line.toString())));
-			response = findMostExpensiveAndHeaviestPackage(packages);
+			lines = Files.lines(path).collect(Collectors.toList());
+			System.out.println("::lines.size::" + lines.size());
+			for (String line : lines) {
+				packages.add(mapLineToPackage(line));
+			}
+//			lines.forEach(line -> packages.add(mapLineToPackage(line.toString())));
+			response = getOutput(packages);
 		} catch (URISyntaxException | IOException | NullPointerException e) {
 			throw new APIException(e.getMessage(), e);
-		} finally {
-			if (Objects.nonNull(lines)) {
-				lines.close();
-			}
 		}
 		return response;
 	}
 
 	private static String getOutput(List<Package> packages) {
 		String output = "";
-		packages.stream().forEach(pckage -> output.concat(findMostExpensiveAndHeaviestPackage(pckage)));
-		return "-";
+		for (Package pckage : packages) {
+			output += findMostExpensiveAndHeaviestPackage(pckage).getSolution();
+		}
+		//I TRIED TO USE A LAMBDA BUT DIDNT WORK SO I CHANGE TO A FOR
+		//		packages.forEach(pckage-> output.concat(findMostExpensiveAndHeaviestPackage(pckage).getSolution()));
+		System.out.println("::outputreal::" + output);
+		return output;
 	}
 
-	private static String findMostExpensiveAndHeaviestPackage(Package pckage) {
-		return findMostExpensive(findAllWeights(pckage));
+	private static Output findMostExpensiveAndHeaviestPackage(Package pckage) {
+		System.out.println("::findAllWeights(pckage):: " + findAllWeights(pckage));
+		System.out.println("::findAllWeights(pckage).getSolution():: " + findAllWeights(pckage).getSolution());
+		return findAllWeights(pckage);
 	}
 
-	private static String findAllWeights(Package pckage) {
+	private static Output findAllWeights(Package pckage) {
 		int NB_ITEMS = pckage.getItems().size();
 		// we use a matrix to store the max value at each n-th item
-		int[][] matrix = new int[NB_ITEMS + 1][Integer.valueOf(pckage.getCapacity()) + 1];
+		int[][] matrix = new int[NB_ITEMS + 1][pckage.getCapacity().intValue() + 1];
 		// first line is initialized to 0
-		for (int i = 0; i <= pckage.getCapacity(); i++)
+		for (int i = 0; i <= pckage.getCapacity().intValue(); i++)
 			matrix[0][i] = 0;
 		// we iterate on items
 		for (int i = 1; i <= NB_ITEMS; i++) {
 			// we iterate on each pckage.getCapacity()
-			for (int j = 0; j <= pckage.getCapacity(); j++) {
-				if (items[i - 1].weight > j)
+			for (int j = 0; j <= pckage.getCapacity().intValue(); j++) {
+				if (pckage.getItems().get(i - 1).getWeight().intValue() > j)
 					matrix[i][j] = matrix[i - 1][j];
 				else
 					// we maximize value at this rank in the matrix
-					matrix[i][j] = Math.max(matrix[i - 1][j], matrix[i - 1][j - items[i - 1].weight] +
-							items[i - 1].value);
+					matrix[i][j] = Math.max(matrix[i - 1][j], matrix[i - 1][j - pckage.getItems().get(i - 1).getWeight().intValue()] +
+							pckage.getItems().get(i - 1).getPrice().intValue());
 			}
 		}
-		return "";
+		return findMostExpensive(matrix, NB_ITEMS, pckage);
 	}
 
-	private static String findMostExpensive(String weights) {
-		int res = matrix[NB_ITEMS][capacity];
-		int w = capacity;
+	private static Output findMostExpensive(int[][] matrix, int NB_ITEMS, Package pckage) {
+		int res = matrix[NB_ITEMS][pckage.getCapacity().intValue()];
+		int w = pckage.getCapacity().intValue();
 		List<Item> itemsSolution = new ArrayList<>();
-
-		for (int i = NB_ITEMS; i > 0  &&  res > 0; i--) {
-			if (res != matrix[i-1][w]) {
-				itemsSolution.add(items[i-1]);
+		for (int i = NB_ITEMS; i > 0 && res > 0; i--) {
+			if (res != matrix[i - 1][w]) {
+				itemsSolution.add(pckage.getItems().get(i - 1));
 				// we remove items value and weight
-				res -= items[i-1].value;
-				w -= items[i-1].weight;
+				res -= pckage.getItems().get(i - 1).getPrice().intValue();
+				w -= pckage.getItems().get(i - 1).getWeight().intValue();
 			}
 		}
-		return "";
+		System.out.println("::itemSolution:: " + itemsSolution);
+		System.out.println("::Objects.isNull(itemsSolution):: " + Objects.isNull(itemsSolution));
+		System.out.println("::itemsSolution.isEmpty():: " + itemsSolution.isEmpty());
+		if (Objects.isNull(itemsSolution) || itemsSolution.isEmpty()) {
+			return new Output("-");
+		}
+		System.out.println("::itemsSolution.get(0).getIndex().toString():: " + itemsSolution.get(0).getIndex().toString());
+		String output = "";
+		for (int i = itemsSolution.size() - 1; i >= 0; i--) {
+			output += " " + itemsSolution.get(i).getIndex();
+		}
+		return new Output(output.trim().replace(" ", ","));
 	}
 
-	private static List<Package> mapLineToPackage(String line) {
-		List<Package> packagesList = null;
+	private static Package mapLineToPackage(String line) {
+		Package pckage = null;
 		String[] capacityAndItems = line.trim().split(" : ");
 		String capacity = capacityAndItems[0];
 		String items = capacityAndItems[1];
-		packagesList.add(mapStringToPackage(capacity, items));
-		return packagesList;
+		pckage = mapStringToPackage(capacity, items);
+		return pckage;
 	}
 
 	private static Package mapStringToPackage(String capacity, String items) {
@@ -102,7 +120,7 @@ public class Packer {
 	}
 
 	private static List<Item> mapItems(String items) {
-		List<Item> itemsList = null;
+		List<Item> itemsList = new ArrayList<>();
 		String[] stringItems = items.trim()
 				.replace("(", "")
 				.replace(")", "")
