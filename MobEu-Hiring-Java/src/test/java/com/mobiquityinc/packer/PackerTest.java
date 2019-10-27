@@ -46,7 +46,6 @@ public class PackerTest {
 		String expectedOutput = "4";
 		String data = "81 : (1,53.38,€45) (2,88.62,€98) (3,78.48,€3) (4,72.30,€76) (5,30.18,€9) (6,46.34,€48)";
 		String output = Packer.pack("fileOneLineTest.txt");
-		System.out.println("::output:: " + output);
 		Assert.assertEquals(expectedOutput, output);
 
 	}
@@ -55,7 +54,6 @@ public class PackerTest {
 	public void bestValueFile() throws APIException {
 		String expectedOutput = "4-2,78,9";
 		String output = Packer.pack("fileTest.txt");
-		System.out.println("::output:: " + output);
 		Assert.assertEquals(expectedOutput, output);
 	}
 

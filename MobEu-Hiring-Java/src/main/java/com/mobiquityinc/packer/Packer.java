@@ -29,7 +29,6 @@ public class Packer {
 		try {
 			path = Paths.get(Packer.class.getClassLoader().getResource(filePath).toURI());
 			lines = Files.lines(path).collect(Collectors.toList());
-			System.out.println("::lines.size::" + lines.size());
 			for (String line : lines) {
 				packages.add(mapLineToPackage(line));
 			}
@@ -48,13 +47,10 @@ public class Packer {
 		}
 		//I TRIED TO USE A LAMBDA BUT DIDNT WORK SO I CHANGE TO A FOR
 		//		packages.forEach(pckage-> output.concat(findMostExpensiveAndHeaviestPackage(pckage).getSolution()));
-		System.out.println("::outputreal::" + output);
 		return output;
 	}
 
 	private static Output findMostExpensiveAndHeaviestPackage(Package pckage) {
-		System.out.println("::findAllWeights(pckage):: " + findAllWeights(pckage));
-		System.out.println("::findAllWeights(pckage).getSolution():: " + findAllWeights(pckage).getSolution());
 		return findAllWeights(pckage);
 	}
 
@@ -92,13 +88,9 @@ public class Packer {
 				w -= pckage.getItems().get(i - 1).getWeight().intValue();
 			}
 		}
-		System.out.println("::itemSolution:: " + itemsSolution);
-		System.out.println("::Objects.isNull(itemsSolution):: " + Objects.isNull(itemsSolution));
-		System.out.println("::itemsSolution.isEmpty():: " + itemsSolution.isEmpty());
 		if (Objects.isNull(itemsSolution) || itemsSolution.isEmpty()) {
 			return new Output("-");
 		}
-		System.out.println("::itemsSolution.get(0).getIndex().toString():: " + itemsSolution.get(0).getIndex().toString());
 		String output = "";
 		for (int i = itemsSolution.size() - 1; i >= 0; i--) {
 			output += " " + itemsSolution.get(i).getIndex();
