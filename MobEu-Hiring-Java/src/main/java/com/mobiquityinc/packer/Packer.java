@@ -4,38 +4,40 @@ import com.mobiquityinc.entity.Item;
 import com.mobiquityinc.entity.Output;
 import com.mobiquityinc.entity.Package;
 import com.mobiquityinc.exception.APIException;
+import org.apache.commons.io.IOUtils;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class Packer {
 
 	public Packer() {
 	}
 
-	public static String pack(String filePath) throws APIException {
+	public static String pack(String filePath) throws APIException, IOException {
 		Path path;
 		List<Package> packages = new ArrayList<>();
 		String response = "";
 		List<String> lines = null;
 		try {
-			path = Paths.get(Packer.class.getClassLoader().getResource(filePath).toURI());
-			lines = Files.lines(path).collect(Collectors.toList());
+			FileInputStream fis = new FileInputStream(filePath);
+			String data = IOUtils.toString(fis, "UTF-8");
+			lines = Arrays.asList(data.trim().split("\n"));
 			for (String line : lines) {
 				packages.add(mapLineToPackage(line));
 			}
 //			lines.forEach(line -> packages.add(mapLineToPackage(line.toString())));
 			response = getOutput(packages);
-		} catch (URISyntaxException | IOException | NullPointerException e) {
+		} catch (APIException e) {
 			throw new APIException(e.getMessage(), e);
+		} catch (IOException e) {
+			throw new IOException(e.getMessage(), e);
 		}
 		return response;
 	}
@@ -98,26 +100,33 @@ public class Packer {
 		return new Output(output.trim().replace(" ", ","));
 	}
 
-	private static Package mapLineToPackage(String line) {
+	private static Package mapLineToPackage(String line) throws APIException {
 		Package pckage = null;
 		String[] capacityAndItems = line.trim().split(" : ");
 		String capacity = capacityAndItems[0];
+		Integer intCapacity = new Integer(capacity);
+		if (intCapacity > 100) {
+			throw new APIException("Weight is greater than 100");
+		}
 		String items = capacityAndItems[1];
 		pckage = mapStringToPackage(capacity, items);
 		return pckage;
 	}
 
-	private static Package mapStringToPackage(String capacity, String items) {
+	private static Package mapStringToPackage(String capacity, String items) throws APIException {
 		return new Package(mapItems(items), new BigDecimal(capacity));
 	}
 
-	private static List<Item> mapItems(String items) {
+	private static List<Item> mapItems(String items) throws APIException {
 		List<Item> itemsList = new ArrayList<>();
 		String[] stringItems = items.trim()
 				.replace("(", "")
 				.replace(")", "")
 				.replace("€", "")
 				.split(" ");
+		if (stringItems.length > 15) {
+			throw new APIException("A line has more than 15 items");
+		}
 		for (String stringItem : stringItems) {
 			String[] arrayItem = stringItem.split(",");
 			itemsList.add(mapArrayItemToItem(arrayItem));
